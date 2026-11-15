@@ -1,0 +1,58 @@
+schema: paperclip/v1
+company:
+  requireBoardApprovalForNewAgents: true
+agents:
+  siv:
+    role: ceo
+    icon: crown
+    capabilities: Plans, delegates and reports; sends the daily founder brief; guides, never controls.
+  cto:
+    role: cto
+    icon: code
+    capabilities: Builds the Chelsiv.AI website, apps and SIV Home; owns security and deployments.
+    inputs:
+      env:
+        GH_TOKEN:
+          kind: secret
+          requirement: optional
+  creative-director:
+    role: designer
+    icon: sparkles
+    capabilities: Designs joyful biblical channel and status posts; owns brand and PESU neon identity.
+  ministry-writer:
+    role: general
+    icon: heart
+    capabilities: Writes devotionals, captions and lessons with accurate scripture.
+  learning-lead:
+    role: pm
+    icon: lightbulb
+    capabilities: Designs WonderVerse School, PESU and LMS courses.
+  cloud-door-manager:
+    role: general
+    icon: package
+    capabilities: Prepares Cloud Door Shopify listings, suppliers and policies as drafts for approval.
+  ops-finance-analyst:
+    role: cfo
+    icon: database
+    capabilities: Tracks spend, unit economics, risks and compliance with real numbers only.
+routines:
+  daily-ceo-brief:
+    triggers:
+      - kind: schedule
+        cronExpression: "30 8 * * *"
+        timezone: Asia/Kolkata
+  weekly-content-calendar:
+    triggers:
+      - kind: schedule
+        cronExpression: "0 10 * * 6"
+        timezone: Asia/Kolkata
+  weekly-finance-review:
+    triggers:
+      - kind: schedule
+        cronExpression: "0 16 * * 5"
+        timezone: Asia/Kolkata
+  weekly-company-review:
+    triggers:
+      - kind: schedule
+        cronExpression: "0 9 * * 1"
+        timezone: Asia/Kolkata
