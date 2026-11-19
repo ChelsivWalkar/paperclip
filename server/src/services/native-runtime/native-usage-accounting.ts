@@ -69,6 +69,7 @@ export function createNativeTurnAccounting(provider: NativeExecutionInput["provi
     restored?: boolean }>();
   const sequences = new Map<string, number>();
   let currentTurn: string | undefined;
+  let providerRequestId: string | undefined;
   const terminalTypes = ["turn.completed", "turn.failed", "turn.cancelled", "turn.interrupted"];
   const snapshot = () => {
     if (turns.size === 0) return { usage: null, turnId: undefined, complete: false };
@@ -97,7 +98,8 @@ export function createNativeTurnAccounting(provider: NativeExecutionInput["provi
       ...(retainCost ? { providerCostUsd: Number(cost) / 1_000_000_000 } : {}) };
     const current = currentTurn ? turns.get(currentTurn) : undefined;
     return { usage: { runDelta, accountingCostIncomplete: costIncomplete, ...(usageLost ? { accountingUsageLost: true } : {}),
-      ...(retainCost ? { accountingCostUsdExact: `${cost / 1_000_000_000n}.${String(cost % 1_000_000_000n).padStart(9, "0")}` } : {}) },
+      ...(retainCost ? { accountingCostUsdExact: `${cost / 1_000_000_000n}.${String(cost % 1_000_000_000n).padStart(9, "0")}` } : {}),
+      ...(providerRequestId ? { providerRequestId } : {}) },
       // A turn closed as lost still names the terminal turn the executor must match.
       turnId: current && (normalizeNativeUsage(current.usage) || (current.lost && current.terminal)) ? currentTurn : undefined, complete };
   };
@@ -133,6 +135,8 @@ export function createNativeTurnAccounting(provider: NativeExecutionInput["provi
       } else if (payload.kind === "usage" && (!currentTurn || !turns.has(key))) currentTurn = event.turnId;
       if (payload.kind === "usage") {
         const usage = record(payload.usage);
+        if (!providerRequestId && typeof usage.providerRequestId === "string" && usage.providerRequestId)
+          providerRequestId = usage.providerRequestId.slice(0, 250);
         turn.usage = Object.hasOwn(usage, "runDelta")
           ? { runDelta: record(usage.runDelta), runDeltaComplete: usage.runDeltaComplete } : null;
       }
@@ -143,6 +147,11 @@ export function createNativeTurnAccounting(provider: NativeExecutionInput["provi
       return true;
     },
     snapshot,
+    /** A restore matters only while a turn is open. */
+    hasOpenTurn() {
+      for (const turn of turns.values()) if (!turn.terminal) return true;
+      return false;
+    },
     finish(turnId: string | null) {
       const turn = turnId ? turns.get(turnId) : undefined;
       if (turn) turn.terminal = true;
@@ -214,4 +223,12 @@ export function usesNativeUsageDelivery(input: {
 
 export function isNativeUsageAccountingEvent(event: Pick<PrpEvent, "eventType">) {
   return ["usage.reported", "turn.started", "turn.completed", "turn.failed", "turn.cancelled", "turn.interrupted"].includes(event.eventType);
+}
+
+/** Producer delivery for the run itself also needs the session restore: a
+ * turn open across it can close as a lower bound (see createNativeTurnAccounting).
+ * Recovery routing keeps isNativeUsageAccountingEvent: a source run's restore
+ * carries no usage and must not require a proven recovery source. */
+export function isNativeUsageDeliveryEvent(event: Pick<PrpEvent, "eventType">) {
+  return isNativeUsageAccountingEvent(event) || event.eventType === "session.resumed";
 }
