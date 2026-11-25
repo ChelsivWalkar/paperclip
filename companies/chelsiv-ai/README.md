@@ -30,7 +30,7 @@ SIV — AI CEO / Chief of Staff  ── daily CEO brief 08:30 IST ──▶ Walk
 
 | Agent | Title | Reports to | Skills |
 |---|---|---|---|
-| SIV | AI CEO and Chief of Staff | Board (Walkar) | paperclip, daily-ceo-brief, family-privacy-guardrails |
+| SIV | AI CEO and Chief of Staff | Board (Walkar) | paperclip, daily-ceo-brief, family-privacy-guardrails, siv-communications |
 | CTO | Chief Technology Officer | SIV | paperclip, family-privacy-guardrails |
 | Creative Director | Creative Director, Faith & Brand | SIV | paperclip, biblical-post-design, scripture-accuracy-check |
 | Ministry Writer | Ministry Content Writer | Creative Director | paperclip, scripture-accuracy-check |
@@ -49,6 +49,7 @@ SIV — AI CEO / Chief of Staff  ── daily CEO brief 08:30 IST ──▶ Walk
 | `daily-ceo-brief` | Structure for SIV's two-minute daily founder brief |
 | `cloud-door-listing-readiness` | Mandatory real-data checklist before any product listing |
 | `family-privacy-guardrails` | Consent, visibility and "guide, not control" rules for family features |
+| `siv-communications` | Sends founder-approved WhatsApp, email and calls to approved contacts via the Chelsiv.AI outreach API and ElevenLabs |
 
 `paperclip` is Paperclip's built-in coordination skill.
 

@@ -5,7 +5,16 @@ agents:
   siv:
     role: ceo
     icon: crown
-    capabilities: Plans, delegates and reports; sends the daily founder brief; guides, never controls.
+    capabilities: Plans, delegates and reports; sends the daily founder brief; sends approved WhatsApp, email and calls; guides, never controls.
+    inputs:
+      env:
+        SIV_OUTREACH_URL:
+          kind: plain
+          requirement: optional
+          default: https://chelsiv-ai.vercel.app/api/siv-outreach
+        SIV_OUTREACH_TOKEN:
+          kind: secret
+          requirement: optional
   cto:
     role: cto
     icon: code
